@@ -11,5 +11,4 @@ public class MoonConfiguration {
     public MoonPostProcessor moonPostProcessor(){
         return new MoonPostProcessor();
     }
-
 }

@@ -2,7 +2,7 @@ package org.moon.component;
 
 import org.moon.http.MoonHttpRequest;
 import org.springframework.core.env.PropertySource;
-
+import org.springframework.lang.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public class MoonPropertySource extends PropertySource<Map<String, Object>> {
     }
 
     @Override
-    public Object getProperty(String name) {
+    public Object getProperty(@NonNull String name) {
         return source.get(name);
     }
 
@@ -22,7 +22,7 @@ public class MoonPropertySource extends PropertySource<Map<String, Object>> {
      */
     public void initConfig(String serverUrl, String appid) {
         MoonHttpRequest.setServerUrl(serverUrl, appid);
-        Map<String, Object> configMap = MoonHttpRequest.getCustomConfig();
+        Map<String, Object> configMap = MoonHttpRequest.getPublishConfig();
         this.source.putAll(configMap);
     }
 }

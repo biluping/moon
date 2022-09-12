@@ -1,0 +1,17 @@
+package org.moon.config.advice;
+
+import lombok.extern.slf4j.Slf4j;
+import org.moon.entity.vo.BaseVo;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@Slf4j
+@RestControllerAdvice(basePackages = "org.moon.controller")
+public class ExceptionAdvice {
+
+    @ExceptionHandler(Throwable.class)
+    public BaseVo<String> error(Throwable e) {
+        log.error("全局异常捕获", e);
+        return BaseVo.error(e.getMessage());
+    }
+}
