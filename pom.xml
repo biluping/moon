@@ -18,6 +18,8 @@
     <modules>
         <module>moon-sdk</module>
         <module>moon-example</module>
+        <module>moon-server</module>
+        <module>moon-common</module>
     </modules>
 
     <properties>

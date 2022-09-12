@@ -1,16 +1,20 @@
 package org.moon.processor;
 
 import org.moon.component.MoonPropertySource;
-import org.moon.config.MoonConfigProperties;
-import org.moon.dto.MoonConfigDto;
+import org.moon.entity.dto.MoonConfigDto;
 import org.moon.http.MoonHttpRequest;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.env.*;
-import java.util.*;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
+
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -20,20 +24,14 @@ import java.util.stream.StreamSupport;
  */
 public class MoonPostProcessor implements BeanFactoryPostProcessor, EnvironmentAware {
 
-    private final MoonConfigProperties moonConfigProperties;
-
     private Environment environment;
-
-    public MoonPostProcessor(MoonConfigProperties moonConfigProperties) {
-        this.moonConfigProperties = moonConfigProperties;
-    }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
         // 初始化Moon配置
         MoonPropertySource moonPropertySource = new MoonPropertySource("moonPropertySource");
-        moonPropertySource.initConfig(moonConfigProperties);
+        moonPropertySource.initConfig(environment.getRequiredProperty("moon.server-url"), environment.getRequiredProperty("moon.appid"));
 
         // 将Moon配置放入首位，以使配置生效
         String propertySourcesPlaceholderConfigurerBeanName = "propertySourcesPlaceholderConfigurer";
@@ -52,9 +50,7 @@ public class MoonPostProcessor implements BeanFactoryPostProcessor, EnvironmentA
                 .collect(Collectors.toList());
 
         // 添加Moon配置
-        moonPropertySource.getSource().forEach((k, v) -> {
-            configList.add(new MoonConfigDto(k, v, true));
-        });
+        moonPropertySource.getSource().forEach((k, v) -> configList.add(new MoonConfigDto(k, v, true)));
 
         // 将配置上传到Moon服务端
         MoonHttpRequest.uploadConfig(configList);

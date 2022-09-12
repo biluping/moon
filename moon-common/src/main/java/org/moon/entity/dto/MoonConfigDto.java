@@ -1,4 +1,4 @@
-package org.moon.dto;
+package org.moon.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MoonConfigDto {
     private String key;
-    private String val;
+    private Object val;
     private Boolean isMoonConfig;
 }
