@@ -1,14 +1,18 @@
 package org.moon.http;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.moon.entity.vo.BaseVo;
+import org.moon.entity.vo.MoonConfigVo;
+import org.moon.exception.MoonBadRequestException;
 import org.moon.utils.HttpUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class MoonHttpRequest {
@@ -25,19 +29,20 @@ public class MoonHttpRequest {
     /**
      * 从服务端拉取自定义配置
      */
-    public static Map<String, Object> getPublishConfig() {
-        String url = String.format("%s/config/publish/%s", serverUrl, appid);
+    public static List<MoonConfigVo> getPublishConfig() {
+        String url = String.format("%s/config/moon/%s?isPublish=1", serverUrl, appid);
         try {
-            BaseVo<Map<String, Object>> vo = HttpUtils.doGet(url, new TypeReference<>() {});
+            BaseVo<List<MoonConfigVo>> vo = HttpUtils.doGet(url, new TypeReference<>() {});
             if (vo.getCode() == 200){
+                log.info("获取moon配置成功, 数据:");
+                System.out.println(JSONObject.toJSONString(vo.getData(), SerializerFeature.PrettyFormat));
                 return vo.getData();
             } else {
-                log.warn("请求失败, url: {}, data:{}", url, JSON.toJSONString(vo));
-                return new HashMap<>();
+                throw new MoonBadRequestException(JSON.toJSONString(vo));
             }
         } catch (IOException e) {
-            log.error("请求{}异常", url, e);
-            return new HashMap<>();
+            log.error("请求异常, url: {}", url, e);
+            return new ArrayList<>();
         }
     }
 }

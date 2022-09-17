@@ -1,9 +1,11 @@
 package org.moon.component;
 
+import org.moon.entity.vo.MoonConfigVo;
 import org.moon.http.MoonHttpRequest;
 import org.springframework.core.env.PropertySource;
 import org.springframework.lang.NonNull;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MoonPropertySource extends PropertySource<Map<String, Object>> {
@@ -22,7 +24,9 @@ public class MoonPropertySource extends PropertySource<Map<String, Object>> {
      */
     public void initConfig(String serverUrl, String appid) {
         MoonHttpRequest.setServerUrl(serverUrl, appid);
-        Map<String, Object> configMap = MoonHttpRequest.getPublishConfig();
-        this.source.putAll(configMap);
+        List<MoonConfigVo> configMap = MoonHttpRequest.getPublishConfig();
+        configMap.forEach(config ->{
+            this.source.put(config.getKey(), config.getValue());
+        });
     }
 }

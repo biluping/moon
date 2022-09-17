@@ -2,6 +2,7 @@ package org.moon.service;
 
 import org.moon.entity.MoonAppEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.moon.entity.ao.MoonAppAo;
 
 /**
 * @author biluping
@@ -10,4 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface MoonAppService extends IService<MoonAppEntity> {
 
+    void createApp(MoonAppAo ao);
 }

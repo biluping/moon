@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 应用表
  */
 @TableName(value ="moon_app")
-@Data()
+@Data
 @EqualsAndHashCode(callSuper = true)
 public class MoonAppEntity extends BaseEntity implements Serializable {
 

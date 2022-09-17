@@ -3,7 +3,7 @@ package org.moon.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.squareup.okhttp.*;
-import org.moon.exception.MoonRequestException;
+import org.moon.exception.MoonBadRequestException;
 
 import java.io.IOException;
 
@@ -21,7 +21,7 @@ public class HttpUtils {
             } else if (typeReference != null){
                 return JSON.parseObject(string, typeReference);
             } else {
-                throw new MoonRequestException("返回值类型未知");
+                throw new MoonBadRequestException("返回值类型未知");
             }
         }
     }
