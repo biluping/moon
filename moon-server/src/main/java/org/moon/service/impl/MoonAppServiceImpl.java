@@ -9,6 +9,8 @@ import org.moon.mapper.MoonAppMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
+
 /**
 * @author biluping
 * @description 针对表【moon_app】的数据库操作Service实现
@@ -29,7 +31,8 @@ public class MoonAppServiceImpl extends ServiceImpl<MoonAppMapper, MoonAppEntity
         save(entity);
     }
 
-    public MoonAppEntity getById(String appid){
+    @Override
+    public MoonAppEntity getById(Serializable appid){
         return query().eq("appid", appid).one();
     }
 }

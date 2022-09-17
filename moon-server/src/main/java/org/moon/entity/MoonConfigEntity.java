@@ -34,7 +34,7 @@ public class MoonConfigEntity extends BaseEntity implements Serializable {
     /**
      * 是否发布
      */
-    private Integer isPublish;
+    private Boolean isPublish;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
