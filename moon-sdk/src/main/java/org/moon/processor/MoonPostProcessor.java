@@ -44,16 +44,4 @@ public class MoonPostProcessor implements BeanFactoryPostProcessor, EnvironmentA
     public void setEnvironment(@NonNull Environment environment) {
         this.environment = environment;
     }
-
-    public Map<String, Object> getPropertiesFileConfigMap(){
-        // 获取配置文件中的配置
-        MutablePropertySources propertySources = ((ConfigurableEnvironment)environment).getPropertySources();
-        return StreamSupport.stream(propertySources.spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource)
-                .filter(ps -> ps.getName().startsWith("Config resource"))
-                .map(ps -> ((EnumerablePropertySource<?>) ps).getPropertyNames())
-                .flatMap(Arrays::stream)
-                .distinct()
-                .collect(Collectors.toMap(Function.identity(), key -> environment.getRequiredProperty(key)));
-    }
 }
