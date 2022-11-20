@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>org.moon</groupId>
-            <artifactId>moom-sdk</artifactId>
+            <artifactId>moon-sdk</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
