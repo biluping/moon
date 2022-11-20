@@ -1,14 +1,16 @@
 package org.moon.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.moon.Constant;
+import org.moon.constant.MoonConstant;
 import org.moon.entity.MoonAppEntity;
 import org.moon.entity.MoonConfigEntity;
 import org.moon.entity.ao.ConfigAo;
 import org.moon.entity.dto.AppConfigDto;
-import org.moon.entity.dto.MoonConfigDto;
+import org.moon.entity.vo.BaseVo;
 import org.moon.entity.vo.MoonConfigVo;
 import org.moon.exception.MoonBadRequestException;
 import org.moon.service.MoonAppService;
@@ -19,9 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,9 +67,14 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
     public AppConfigDto getAppConfig(String appid) {
         MoonAppEntity app = appService.getById(appid);
         try{
-            return HttpUtils.doGet(app.getAppUrl()+"/moon/getAppConfig", AppConfigDto.class);
+            BaseVo<AppConfigDto> vo = HttpUtils.doGet(app.getAppUrl()+"/moon/getAppConfig", new TypeReference<>(){});
+            if (vo.getCode() == MoonConstant.SUCCESS){
+                return vo.getData();
+            } else {
+                throw new MoonBadRequestException(JSONObject.toJSONString(vo));
+            }
         }catch (IOException e){
-            log.error("获取应用配置失败, appid:{}", appid);
+            log.error("获取应用配置失败, appid:{}", appid, e);
             throw new MoonBadRequestException("获取应用配置失败");
         }
     }

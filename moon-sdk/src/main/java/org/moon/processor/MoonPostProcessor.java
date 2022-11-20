@@ -34,8 +34,7 @@ public class MoonPostProcessor implements BeanFactoryPostProcessor, EnvironmentA
         moonPropertySource.initConfig(environment.getRequiredProperty("moon.server-url"), environment.getRequiredProperty("moon.appid"));
 
         // 将Moon配置放入首位，以使配置生效
-        String propertySourcesPlaceholderConfigurerBeanName = "propertySourcesPlaceholderConfigurer";
-        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = beanFactory.getBean(propertySourcesPlaceholderConfigurerBeanName, PropertySourcesPlaceholderConfigurer.class);
+        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = beanFactory.getBean(PropertySourcesPlaceholderConfigurer.class);
         MutablePropertySources mutablePropertySources = (MutablePropertySources)propertySourcesPlaceholderConfigurer.getAppliedPropertySources();
         mutablePropertySources.addFirst(moonPropertySource);
     }

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class MoonConfiguration {
 
     @Bean
-    public MoonPostProcessor moonPostProcessor(){
+    public static MoonPostProcessor moonPostProcessor(){
         return new MoonPostProcessor();
     }
 }

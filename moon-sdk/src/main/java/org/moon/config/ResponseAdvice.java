@@ -1,4 +1,4 @@
-package org.moon.config.advice;
+package org.moon.config;
 
 import com.alibaba.fastjson.JSONObject;
 import org.jetbrains.annotations.NotNull;
