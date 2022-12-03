@@ -14,9 +14,14 @@ public class MoonAppController {
 
     private MoonAppService moonAppService;
 
-    @PostMapping("/create")
-    public void create(@RequestBody MoonAppAo ao){
-        moonAppService.createApp(ao);
+    @PostMapping
+    public void createOrUpdate(@RequestBody MoonAppAo ao){
+        moonAppService.createOrUpdateApp(ao);
+    }
+
+    @DeleteMapping("{appid}")
+    public void create(@PathVariable String appid){
+        moonAppService.removeByAppid(appid);
     }
 
     @GetMapping

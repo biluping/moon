@@ -3,7 +3,6 @@ package org.moon.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.moon.entity.MoonAppEntity;
 import org.moon.entity.ao.MoonAppAo;
-import org.moon.exception.MoonBadRequestException;
 import org.moon.service.MoonAppService;
 import org.moon.mapper.MoonAppMapper;
 import org.springframework.beans.BeanUtils;
@@ -21,18 +20,22 @@ public class MoonAppServiceImpl extends ServiceImpl<MoonAppMapper, MoonAppEntity
     implements MoonAppService{
 
     @Override
-    public void createApp(MoonAppAo ao) {
-        MoonAppEntity app = getById(ao.getAppid());
-        if (app != null){
-            throw new MoonBadRequestException(String.format("appid %s 已经存在", ao.getAppid()));
+    public void createOrUpdateApp(MoonAppAo ao) {
+        MoonAppEntity app = getByAppId(ao.getAppid());
+        if (app == null){
+            app = new MoonAppEntity();
         }
-        MoonAppEntity entity = new MoonAppEntity();
-        BeanUtils.copyProperties(ao, entity);
-        save(entity);
+        BeanUtils.copyProperties(ao, app);
+        saveOrUpdate(app);
     }
 
     @Override
-    public MoonAppEntity getById(Serializable appid){
+    public void removeByAppid(String appid) {
+        lambdaUpdate().eq(MoonAppEntity::getAppid, appid).remove();
+    }
+
+    @Override
+    public MoonAppEntity getByAppId(Serializable appid){
         return query().eq("appid", appid).one();
     }
 }

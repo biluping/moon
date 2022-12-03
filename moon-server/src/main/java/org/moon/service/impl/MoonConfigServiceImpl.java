@@ -65,7 +65,7 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
 
     @Override
     public AppConfigDto getAppConfig(String appid) {
-        MoonAppEntity app = appService.getById(appid);
+        MoonAppEntity app = appService.getByAppId(appid);
         try{
             BaseVo<AppConfigDto> vo = HttpUtils.doGet(app.getAppUrl()+"/moon/getAppConfig", new TypeReference<>(){});
             if (vo.getCode() == MoonConstant.SUCCESS){
