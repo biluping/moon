@@ -3,6 +3,7 @@ package org.moon.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpStatus;
 import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -38,7 +39,7 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
     public List<MoonConfigVo> getMoonConfig(String appid, Integer isPublish) {
         LambdaQueryWrapper<MoonConfigEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(MoonConfigEntity::getAppid, appid);
-        wrapper.eq(isPublish!=null,MoonConfigEntity::getIsPublish, MoonConfigPublishEnum.PUBLISH.getCode());
+        wrapper.eq(isPublish!=null,MoonConfigEntity::getIsPublish, isPublish!=null&&isPublish==MoonConfigPublishEnum.PUBLISH.getCode());
         List<MoonConfigEntity> list = list(wrapper);
         return BeanUtil.copyToList(list, MoonConfigVo.class);
     }
@@ -66,7 +67,7 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
     public AppConfigDto getAppConfig(String appid) {
         MoonAppEntity app = appService.getByAppId(appid);
         String json = HttpUtil.get(app.getAppUrl() + "/moon/getAppConfig", 5000);
-        BaseVo<AppConfigDto> vo = JSONObject.parseObject(json, new TypeReference<>(){});
+        BaseVo<AppConfigDto> vo = JSON.parseObject(json, new TypeReference<>(){});
         if (vo.getCode() == HttpStatus.HTTP_OK){
             return vo.getData();
         } else {
