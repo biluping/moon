@@ -1,28 +1,30 @@
 package org.moon.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.http.HttpStatus;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.moon.constant.MoonConstant;
 import org.moon.entity.MoonAppEntity;
 import org.moon.entity.MoonConfigEntity;
 import org.moon.entity.ao.ConfigAo;
 import org.moon.entity.dto.AppConfigDto;
 import org.moon.entity.vo.BaseVo;
 import org.moon.entity.vo.MoonConfigVo;
+import org.moon.enums.MoonConfigPublishEnum;
 import org.moon.exception.MoonBadRequestException;
+import org.moon.mapper.MoonConfigMapper;
 import org.moon.service.MoonAppService;
 import org.moon.service.MoonConfigService;
-import org.moon.mapper.MoonConfigMapper;
-import org.moon.utils.HttpUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,14 +36,11 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
 
     @Override
     public List<MoonConfigVo> getMoonConfig(String appid, Integer isPublish) {
-        List<MoonConfigEntity> list = query().eq("appid", appid)
-                .eq(isPublish != null, "is_publish", isPublish!=null&&isPublish==1)
-                .list();
-        return list.stream().map(item -> {
-            MoonConfigVo vo = new MoonConfigVo();
-            BeanUtils.copyProperties(item, vo);
-            return vo;
-        }).collect(Collectors.toList());
+        LambdaQueryWrapper<MoonConfigEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(MoonConfigEntity::getAppid, appid);
+        wrapper.eq(isPublish!=null,MoonConfigEntity::getIsPublish, MoonConfigPublishEnum.PUBLISH.getCode());
+        List<MoonConfigEntity> list = list(wrapper);
+        return BeanUtil.copyToList(list, MoonConfigVo.class);
     }
 
     @Override
@@ -57,25 +56,21 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
 
     @Override
     public void publish(String appid, String key) {
-        lambdaUpdate().eq(MoonConfigEntity::getAppid, appid)
-                .eq(MoonConfigEntity::getKey, key)
-                .set(MoonConfigEntity::getIsPublish, true)
-                .update();
+        LambdaUpdateWrapper<MoonConfigEntity> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(MoonConfigEntity::getKey, key);
+        wrapper.set(MoonConfigEntity::getIsPublish, true);
+        update(wrapper);
     }
 
     @Override
     public AppConfigDto getAppConfig(String appid) {
         MoonAppEntity app = appService.getByAppId(appid);
-        try{
-            BaseVo<AppConfigDto> vo = HttpUtils.doGet(app.getAppUrl()+"/moon/getAppConfig", new TypeReference<>(){});
-            if (vo.getCode() == MoonConstant.SUCCESS){
-                return vo.getData();
-            } else {
-                throw new MoonBadRequestException(JSONObject.toJSONString(vo));
-            }
-        }catch (IOException e){
-            log.error("获取应用配置失败, appid:{}", appid, e);
-            throw new MoonBadRequestException("获取应用配置失败");
+        String json = HttpUtil.get(app.getAppUrl() + "/moon/getAppConfig", 5000);
+        BaseVo<AppConfigDto> vo = JSONObject.parseObject(json, new TypeReference<>(){});
+        if (vo.getCode() == HttpStatus.HTTP_OK){
+            return vo.getData();
+        } else {
+            throw new MoonBadRequestException(JSONObject.toJSONString(vo));
         }
     }
 

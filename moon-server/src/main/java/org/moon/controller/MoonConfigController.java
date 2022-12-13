@@ -22,7 +22,7 @@ public class MoonConfigController {
         return moonConfigService.getAppConfig(appid);
     }
 
-    // 获取moon配置
+    // 获取moon配置,存储在数据库中的配置
     @GetMapping("/moon/{appid}")
     public List<MoonConfigVo> getMoonConfig(@PathVariable String appid, Integer isPublish){
         return moonConfigService.getMoonConfig(appid, isPublish);
