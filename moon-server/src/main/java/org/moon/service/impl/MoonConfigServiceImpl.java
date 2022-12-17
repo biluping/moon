@@ -67,8 +67,16 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
     public AppConfigDto getAppConfig(String appid) {
         MoonAppEntity app = appService.getByAppId(appid);
         String json = HttpUtil.get(app.getAppUrl() + "/moon/getAppConfig", 5000);
-        BaseVo<AppConfigDto> vo = JSON.parseObject(json, new TypeReference<>(){});
+        BaseVo<AppConfigDto> vo = JSON.parseObject(json, new TypeReference<BaseVo<AppConfigDto>>(){});
         if (vo.getCode() == HttpStatus.HTTP_OK){
+            // 拼上未发布的配置
+            LambdaQueryWrapper<MoonConfigEntity> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(MoonConfigEntity::getAppid, appid);
+            wrapper.eq(MoonConfigEntity::getIsPublish, false);
+            List<MoonConfigEntity> list = list(wrapper);
+            list.forEach(c->{
+                vo.getData().getCustomConfig().put(c.getKey(), c.getValue());
+            });
             return vo.getData();
         } else {
             throw new MoonBadRequestException(JSONObject.toJSONString(vo));
