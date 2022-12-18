@@ -15,6 +15,7 @@ import org.moon.entity.MoonAppEntity;
 import org.moon.entity.MoonConfigEntity;
 import org.moon.entity.ao.ConfigAo;
 import org.moon.entity.dto.AppConfigDto;
+import org.moon.entity.vo.AppConfigVo;
 import org.moon.entity.vo.BaseVo;
 import org.moon.entity.vo.MoonConfigVo;
 import org.moon.enums.MoonConfigPublishEnum;
@@ -26,6 +27,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,33 +55,65 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
             configEntity = new MoonConfigEntity();
             configEntity.setAppid(appid);
         }
+        configEntity.setIsPublish(false);
         BeanUtils.copyProperties(ao, configEntity);
         saveOrUpdate(configEntity);
     }
 
     @Override
-    public void publish(String appid, String key) {
+    public void publish(String appid, List<String> keyList) {
         LambdaUpdateWrapper<MoonConfigEntity> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(MoonConfigEntity::getKey, key);
+        wrapper.in(MoonConfigEntity::getKey, keyList);
         wrapper.set(MoonConfigEntity::getIsPublish, true);
         update(wrapper);
     }
 
     @Override
-    public AppConfigDto getAppConfig(String appid) {
-        MoonAppEntity app = appService.getByAppId(appid);
-        String json = HttpUtil.get(app.getAppUrl() + "/moon/getAppConfig", 5000);
+    public AppConfigVo getAppConfig(String appid) {
+        MoonAppEntity appEntity = appService.getByAppId(appid);
+        String json = HttpUtil.get(appEntity.getAppUrl() + "/moon/getAppConfig", 5000);
         BaseVo<AppConfigDto> vo = JSON.parseObject(json, new TypeReference<BaseVo<AppConfigDto>>(){});
         if (vo.getCode() == HttpStatus.HTTP_OK){
-            // 拼上未发布的配置
-            LambdaQueryWrapper<MoonConfigEntity> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(MoonConfigEntity::getAppid, appid);
-            wrapper.eq(MoonConfigEntity::getIsPublish, false);
-            List<MoonConfigEntity> list = list(wrapper);
-            list.forEach(c->{
-                vo.getData().getCustomConfig().put(c.getKey(), c.getValue());
+            List<MoonConfigEntity> allConfigList = getAllConfig(appid);
+            Map<String, MoonConfigEntity> configMap = allConfigList.stream().collect(Collectors.toMap(MoonConfigEntity::getKey, Function.identity()));
+            Map<String, MoonConfigVo> customConfigMap = vo.getData().getCustomConfig().entrySet().stream().map(e -> {
+                MoonConfigEntity moonConfigEntity = configMap.get(e.getKey());
+                MoonConfigVo moonConfigVo = new MoonConfigVo();
+                moonConfigVo.setKey(e.getKey());
+                moonConfigVo.setValue(moonConfigEntity!=null&&moonConfigEntity.getIsPublish()?moonConfigEntity.getValue():e.getValue().toString());
+                moonConfigVo.setAppid(appid);
+                moonConfigVo.setIsPublish(true);
+                moonConfigVo.setUpdateTime(moonConfigEntity == null ? "-" : moonConfigEntity.getUpdateTime().toString());
+                return moonConfigVo;
+            }).collect(Collectors.toMap(MoonConfigVo::getKey, Function.identity()));
+            allConfigList.stream().filter(c-> !c.getIsPublish()).forEach(c->{
+                MoonConfigVo moonConfigVo = new MoonConfigVo();
+                moonConfigVo.setKey(c.getKey());
+                moonConfigVo.setValue(c.getValue());
+                moonConfigVo.setAppid(appid);
+                moonConfigVo.setIsPublish(false);
+                moonConfigVo.setUpdateTime(c.getUpdateTime().toString());
+                customConfigMap.put(c.getKey(), moonConfigVo);
             });
-            return vo.getData();
+            Map<String, MoonConfigVo> systemConfigMap = vo.getData().getSystemConfig().entrySet().stream().map(e -> {
+                MoonConfigVo moonConfigVo = new MoonConfigVo();
+                moonConfigVo.setKey(e.getKey().toString());
+                moonConfigVo.setValue(e.getValue().toString());
+                moonConfigVo.setAppid(appid);
+                moonConfigVo.setIsPublish(true);
+                moonConfigVo.setUpdateTime("-");
+                return moonConfigVo;
+            }).collect(Collectors.toMap(MoonConfigVo::getKey, Function.identity()));
+            Map<String, MoonConfigVo> systemEnvConfigMap = vo.getData().getSystemEnv().entrySet().stream().map(e -> {
+                MoonConfigVo moonConfigVo = new MoonConfigVo();
+                moonConfigVo.setKey(e.getKey());
+                moonConfigVo.setValue(e.getValue());
+                moonConfigVo.setAppid(appid);
+                moonConfigVo.setIsPublish(true);
+                moonConfigVo.setUpdateTime("-");
+                return moonConfigVo;
+            }).collect(Collectors.toMap(MoonConfigVo::getKey, Function.identity()));
+            return new AppConfigVo(customConfigMap, systemConfigMap, systemEnvConfigMap);
         } else {
             throw new MoonBadRequestException(JSONObject.toJSONString(vo));
         }
@@ -85,6 +121,13 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
 
     public MoonConfigEntity getByKey(String appid, String key){
         return query().eq("appid", appid).eq("key", key).one();
+    }
+
+    public List<MoonConfigEntity> getAllConfig(String appid){
+        // 拼上未发布的配置
+        LambdaQueryWrapper<MoonConfigEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(MoonConfigEntity::getAppid, appid);
+        return list(wrapper);
     }
 }
 

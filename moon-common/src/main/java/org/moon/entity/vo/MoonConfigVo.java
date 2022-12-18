@@ -26,6 +26,11 @@ public class MoonConfigVo {
     /**
      * 是否发布
      */
-    private Integer isPublish;
+    private Boolean isPublish;
+
+    /**
+     * 修改时间
+     */
+    private String updateTime;
 
 }

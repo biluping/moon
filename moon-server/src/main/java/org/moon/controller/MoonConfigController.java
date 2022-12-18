@@ -2,7 +2,7 @@ package org.moon.controller;
 
 import lombok.AllArgsConstructor;
 import org.moon.entity.ao.ConfigAo;
-import org.moon.entity.dto.AppConfigDto;
+import org.moon.entity.vo.AppConfigVo;
 import org.moon.entity.vo.MoonConfigVo;
 import org.moon.service.MoonConfigService;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ public class MoonConfigController {
 
     // 获取当前应用配置
     @GetMapping("/app/{appid}")
-    public AppConfigDto getPreviewConfig(@PathVariable String appid){
+    public AppConfigVo getPreviewConfig(@PathVariable String appid){
         return moonConfigService.getAppConfig(appid);
     }
 
@@ -35,9 +35,9 @@ public class MoonConfigController {
     }
 
     // 发布配置
-    @PutMapping("/publish/{appid}/{key}")
-    public void publish(@PathVariable String appid, @PathVariable String key){
-        moonConfigService.publish(appid, key);
+    @PutMapping("/publish/{appid}")
+    public void publish(@PathVariable String appid, @RequestBody List<String> keyList){
+        moonConfigService.publish(appid, keyList);
     }
 
     // 删除配置
