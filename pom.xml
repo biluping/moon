@@ -14,9 +14,10 @@
     <groupId>org.moon</groupId>
     <artifactId>moon</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
+
     <modules>
-        <module>moon-sdk</module>
+        <module>moon-client-spring-boot-starter</module>
         <module>moon-example</module>
         <module>moon-server</module>
         <module>moon-common</module>
