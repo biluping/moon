@@ -1,0 +1,21 @@
+{
+  "groups": [],
+  "properties": [
+    {
+      "name": "moon.appid",
+      "type": "java.lang.String",
+      "description": "配置中心应用id."
+    },
+    {
+      "name": "moon.host",
+      "type": "java.lang.String",
+      "description": "配置中心主机地址."
+    },
+    {
+      "name": "moon.protocol",
+      "type": "java.lang.String",
+      "description": "配置中心协议."
+    }
+  ],
+  "hints": []
+}

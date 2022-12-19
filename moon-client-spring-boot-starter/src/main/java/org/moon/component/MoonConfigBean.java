@@ -26,6 +26,5 @@ public class MoonConfigBean {
         } catch (IllegalAccessException e) {
             log.error("moon 配置中心更新属性值失败, fieldName:{}, value:{}", field.getName(), value, e);
         }
-
     }
 }

@@ -1,46 +1,33 @@
-//package org.moon.processor;
-//
-//import org.moon.component.MoonPropertySource;
-//import org.springframework.beans.BeansException;
-//import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-//import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-//import org.springframework.context.EnvironmentAware;
-//import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-//import org.springframework.core.env.ConfigurableEnvironment;
-//import org.springframework.core.env.EnumerablePropertySource;
-//import org.springframework.core.env.Environment;
-//import org.springframework.core.env.MutablePropertySources;
-//import org.springframework.lang.NonNull;
-//
-//import java.util.Arrays;
-//import java.util.Map;
-//import java.util.function.Function;
-//import java.util.stream.Collectors;
-//import java.util.stream.StreamSupport;
-//
-///**
-// * BeanFactory后置处理器，执行时机在 PropertySourcesPlaceholderConfigurer 之后
-// * 用于往 MutablePropertySources 中增加注册中心的配置，达到自定义配置的目的
-// */
-//public class MoonPostProcessor implements BeanFactoryPostProcessor, EnvironmentAware {
-//
-//    private Environment environment;
-//
-//    @Override
-//    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-//
-//        // 初始化Moon配置
-//        MoonPropertySource moonPropertySource = new MoonPropertySource("moonPropertySource");
-//        moonPropertySource.initConfig(environment.getRequiredProperty("moon.server-url"), environment.getRequiredProperty("moon.appid"));
-//
-//        // 将Moon配置放入首位，以使配置生效
-//        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = beanFactory.getBean(PropertySourcesPlaceholderConfigurer.class);
-//        MutablePropertySources mutablePropertySources = (MutablePropertySources)propertySourcesPlaceholderConfigurer.getAppliedPropertySources();
-//        mutablePropertySources.addFirst(moonPropertySource);
-//    }
-//
-//    @Override
-//    public void setEnvironment(@NonNull Environment environment) {
-//        this.environment = environment;
-//    }
-//}
+package org.moon.processor;
+
+import com.alibaba.fastjson.JSON;
+import org.moon.component.MoonPropertySource;
+import org.moon.factory.MoonConfigFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.boot.env.OriginTrackedMapPropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class MoonPostProcessor implements EnvironmentPostProcessor {
+
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        // 初始化moon配置源
+        MoonPropertySource moonPropertySource = new MoonPropertySource("moon", new ConcurrentHashMap<>());
+        moonPropertySource.init(environment);
+        environment.getPropertySources().addFirst(moonPropertySource);
+
+        environment.getPropertySources().stream().filter(s -> s instanceof OriginTrackedMapPropertySource || s instanceof MoonPropertySource)
+                .map(s -> ((MapPropertySource) s))
+                .map(s -> s.getSource().entrySet())
+                .flatMap(Collection::stream)
+                .forEach(e -> {
+                    MoonConfigFactory.setConfig(e.getKey(), e.getValue().toString());
+                });
+        System.out.println(JSON.toJSONString(MoonConfigFactory.getConfig()));
+    }
+}

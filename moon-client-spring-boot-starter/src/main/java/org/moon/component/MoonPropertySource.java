@@ -1,32 +1,25 @@
 package org.moon.component;
 
-import org.moon.entity.vo.MoonConfigVo;
-import org.moon.http.MoonHttpRequest;
-import org.springframework.core.env.PropertySource;
-import org.springframework.lang.NonNull;
-import java.util.HashMap;
-import java.util.List;
+import cn.hutool.http.HttpUtil;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+
 import java.util.Map;
 
-public class MoonPropertySource extends PropertySource<Map<String, Object>> {
+/**
+ * moon 配置源，说白了就是存放配置中心配置的地方
+ */
+public class MoonPropertySource extends MapPropertySource {
 
-    public MoonPropertySource(String name) {
-        super(name, new HashMap<>());
+    public MoonPropertySource(String name, Map<String, Object> source) {
+        super(name, source);
     }
 
-    @Override
-    public Object getProperty(@NonNull String name) {
-        return source.get(name);
-    }
-
-    /**
-     * 从服务端获取Moon中手动添加的配置
-     */
-    public void initConfig(String serverUrl, String appid) {
-        MoonHttpRequest.setServerUrl(serverUrl, appid);
-        List<MoonConfigVo> configMap = MoonHttpRequest.getPublishConfig();
-        configMap.forEach(config ->{
-            this.source.put(config.getKey(), config.getValue());
-        });
+    public void init(ConfigurableEnvironment environment) {
+        String appid = environment.getRequiredProperty("moon.appid");
+        String protocol = environment.getProperty("moon.protocol", "http");
+        String host = environment.getRequiredProperty("moon.host");
+        String port = environment.getProperty("moon.port", "10305");
+        String data = HttpUtil.get(String.format("%s://%s:%s/%s", protocol, host, port, appid));
     }
 }

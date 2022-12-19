@@ -1,14 +1,13 @@
 package org.moon;
 
-import org.moon.annotation.EnableMoon;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-@EnableMoon
 @SpringBootApplication
 public class ExampleApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ExampleApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(ExampleApplication.class, args);
     }
 }
