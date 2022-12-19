@@ -1,6 +1,8 @@
 package org.moon.component;
 
 import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
@@ -21,5 +23,9 @@ public class MoonPropertySource extends MapPropertySource {
         String host = environment.getRequiredProperty("moon.host");
         String port = environment.getProperty("moon.port", "10305");
         String data = HttpUtil.get(String.format("%s://%s:%s/%s", protocol, host, port, appid));
+        Map<String, String> moonConfigMap = JSON.parseObject(data, new TypeReference<Map<String, String>>(){});
+        moonConfigMap.forEach((k,v)->{
+            getSource().put(k, v);
+        });
     }
 }

@@ -1,6 +1,5 @@
 package org.moon.processor;
 
-import com.alibaba.fastjson.JSON;
 import org.moon.component.MoonPropertySource;
 import org.moon.factory.MoonConfigFactory;
 import org.springframework.boot.SpringApplication;
@@ -28,6 +27,5 @@ public class MoonPostProcessor implements EnvironmentPostProcessor {
                 .forEach(e -> {
                     MoonConfigFactory.setConfig(e.getKey(), e.getValue().toString());
                 });
-        System.out.println(JSON.toJSONString(MoonConfigFactory.getConfig()));
     }
 }
