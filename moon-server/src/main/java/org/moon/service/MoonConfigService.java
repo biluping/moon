@@ -3,18 +3,18 @@ package org.moon.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.moon.entity.MoonConfigEntity;
 import org.moon.entity.ao.ConfigAo;
-import org.moon.entity.vo.AppConfigVo;
-import org.moon.entity.vo.MoonConfigVo;
+import org.moon.entity.vo.NameSpaceVo;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MoonConfigService extends IService<MoonConfigEntity> {
 
     void publish(String appid, List<String> keyList);
 
-    AppConfigVo getAppConfig(String appid);
+    List<NameSpaceVo> getAppConfig(String appid);
 
-    List<MoonConfigVo> getMoonConfig(String appid, Integer isPublish);
+    Map<String, String> getMoonConfig(String appid, Integer isPublish);
 
     void saveConfig(String appid, ConfigAo ao);
 }

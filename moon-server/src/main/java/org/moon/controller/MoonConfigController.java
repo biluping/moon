@@ -2,12 +2,12 @@ package org.moon.controller;
 
 import lombok.AllArgsConstructor;
 import org.moon.entity.ao.ConfigAo;
-import org.moon.entity.vo.AppConfigVo;
-import org.moon.entity.vo.MoonConfigVo;
+import org.moon.entity.vo.NameSpaceVo;
 import org.moon.service.MoonConfigService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -18,13 +18,13 @@ public class MoonConfigController {
 
     // 获取当前应用配置
     @GetMapping("/app/{appid}")
-    public AppConfigVo getPreviewConfig(@PathVariable String appid){
+    public List<NameSpaceVo> getPreviewConfig(@PathVariable String appid){
         return moonConfigService.getAppConfig(appid);
     }
 
     // 获取moon配置,存储在数据库中的配置
     @GetMapping("/moon/{appid}")
-    public List<MoonConfigVo> getMoonConfig(@PathVariable String appid, Integer isPublish){
+    public Map<String, String> getMoonConfig(@PathVariable String appid, Integer isPublish){
         return moonConfigService.getMoonConfig(appid, isPublish);
     }
 

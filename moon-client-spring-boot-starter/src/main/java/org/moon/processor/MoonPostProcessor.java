@@ -30,7 +30,7 @@ public class MoonPostProcessor implements EnvironmentPostProcessor, Instantiatio
         // 初始化moon配置源
         MoonPropertySource moonPropertySource = new MoonPropertySource("moon", new ConcurrentHashMap<>());
         // 从服务器获取配置
-//        moonPropertySource.init(environment);
+        moonPropertySource.init(environment);
         environment.getPropertySources().addFirst(moonPropertySource);
 
         environment.getPropertySources().stream().filter(s -> s instanceof OriginTrackedMapPropertySource || s instanceof MoonPropertySource)
