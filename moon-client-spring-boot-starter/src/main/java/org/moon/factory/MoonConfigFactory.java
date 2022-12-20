@@ -15,7 +15,7 @@ public class MoonConfigFactory {
 
     private static final Map<String, String> moonConfigMap = new ConcurrentHashMap<>();
 
-    private static final Map<String, MoonConfigBean> moonConfigBeanMap = new ConcurrentHashMap<>();
+    public static final Map<String, MoonConfigBean> moonConfigBeanMap = new ConcurrentHashMap<>();
 
     public static void setConfig(String key, String value){
         moonConfigMap.put(key, value);
@@ -33,7 +33,11 @@ public class MoonConfigFactory {
         return moonConfigMap;
     }
 
-    public static void setConfigBean(String key, Object bean, Field field, String value){
+    public static void addConfigBean(String key, Object bean, Field field){
+        moonConfigBeanMap.put(key, new MoonConfigBean(bean, field));
+    }
+
+    public static void updateBeanConfig(String key, Object bean, Field field, String value){
         if (moonConfigBeanMap.containsKey(key)) {
             log.error("key {} 已经存在，请勿重复设置保存", key);
             return;
