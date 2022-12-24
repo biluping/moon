@@ -36,15 +36,4 @@ public class MoonConfigFactory {
     public static void addConfigBean(String key, Object bean, Field field){
         moonConfigBeanMap.put(key, new MoonConfigBean(bean, field));
     }
-
-    public static void updateBeanConfig(String key, Object bean, Field field, String value){
-        if (moonConfigBeanMap.containsKey(key)) {
-            log.error("key {} 已经存在，请勿重复设置保存", key);
-            return;
-        }
-        moonConfigMap.put(key, value);
-        MoonConfigBean configBean = new MoonConfigBean(bean, field);
-        configBean.setValue(value);
-        moonConfigBeanMap.put(key, configBean);
-    }
 }

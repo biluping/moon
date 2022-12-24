@@ -26,7 +26,7 @@ public class MoonAppController {
 
     @GetMapping
     public List<MoonAppAo> getApps(){
-        return moonAppService.list().stream().map(item -> new MoonAppAo(item.getAppid(), item.getAppUrl()))
+        return moonAppService.list().stream().map(item -> new MoonAppAo(item.getAppid(), item.getHost()))
                 .collect(Collectors.toList());
     }
 

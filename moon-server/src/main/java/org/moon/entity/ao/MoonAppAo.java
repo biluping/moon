@@ -18,6 +18,6 @@ public class MoonAppAo {
     /**
      * 应用url
      */
-    private String appUrl;
+    private String host;
 
 }
