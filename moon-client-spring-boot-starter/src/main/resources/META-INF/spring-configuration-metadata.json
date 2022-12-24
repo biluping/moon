@@ -14,7 +14,8 @@
     {
       "name": "moon.protocol",
       "type": "java.lang.String",
-      "description": "配置中心协议."
+      "description": "配置中心协议.",
+      "defaultValue": "http"
     }
   ],
   "hints": []
