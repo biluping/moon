@@ -4,7 +4,7 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
-import org.moon.entity.vo.BaseVo;
+import org.moon.entity.base.BaseVo;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 

@@ -1,4 +1,4 @@
-package org.moon.entity.vo;
+package org.moon.entity.base;
 
 import lombok.Data;
 

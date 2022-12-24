@@ -22,6 +22,11 @@ public class MoonConfigEntity extends BaseEntity implements Serializable {
     private String appid;
 
     /**
+     * 名称空间id
+     */
+    private Long nameSpaceId;
+
+    /**
      * key
      */
     private String key;

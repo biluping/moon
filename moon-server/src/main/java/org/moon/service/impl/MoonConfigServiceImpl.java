@@ -1,19 +1,21 @@
 package org.moon.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.moon.entity.MoonConfigEntity;
+import org.moon.entity.MoonNameSpaceEntity;
 import org.moon.entity.ao.ConfigAo;
 import org.moon.entity.vo.MoonConfigVo;
-import org.moon.entity.vo.NameSpaceVo;
 import org.moon.enums.MoonConfigPublishEnum;
+import org.moon.exception.MoonBadRequestException;
 import org.moon.mapper.MoonConfigMapper;
-import org.moon.service.MoonAppService;
 import org.moon.service.MoonConfigService;
+import org.moon.service.MoonNameSpaceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonConfigEntity>
     implements MoonConfigService{
 
-    private MoonAppService appService;
+    private MoonNameSpaceService nameSpaceService;
 
     @Override
     public Map<String, String> getMoonConfig(String appid, Integer isPublish) {
@@ -38,11 +40,16 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
     }
 
     @Override
-    public void saveConfig(String appid, ConfigAo ao) {
-        MoonConfigEntity configEntity = getByKey(appid, ao.getKey());
+    public void saveConfig(Long nameSpaceId, ConfigAo ao) {
+        MoonNameSpaceEntity nameSpaceEntity = nameSpaceService.getById(nameSpaceId);
+        if (nameSpaceEntity == null){
+            throw new MoonBadRequestException(StrUtil.format("nameSpaceId:{} 不存在", nameSpaceId));
+        }
+        MoonConfigEntity configEntity = getByKey(nameSpaceId, ao.getKey());
         if (configEntity == null){
             configEntity = new MoonConfigEntity();
-            configEntity.setAppid(appid);
+            configEntity.setAppid(nameSpaceEntity.getAppid());
+            configEntity.setNameSpaceId(nameSpaceId);
         }
         configEntity.setIsPublish(false);
         BeanUtils.copyProperties(ao, configEntity);
@@ -50,24 +57,25 @@ public class MoonConfigServiceImpl extends ServiceImpl<MoonConfigMapper, MoonCon
     }
 
     @Override
-    public void publish(String appid, List<String> keyList) {
+    public void publish(Long nameSpaceId, List<String> keyList) {
         LambdaUpdateWrapper<MoonConfigEntity> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(MoonConfigEntity::getNameSpaceId, nameSpaceId);
         wrapper.in(MoonConfigEntity::getKey, keyList);
         wrapper.set(MoonConfigEntity::getIsPublish, true);
         update(wrapper);
     }
 
     @Override
-    public List<NameSpaceVo> getAppConfig(String appid) {
+    public List<MoonConfigVo> getAppConfig(Long nameSpaceId) {
         LambdaQueryWrapper<MoonConfigEntity> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MoonConfigEntity::getAppid, appid);
-        List<MoonConfigVo> list = Convert.toList(MoonConfigVo.class, list(wrapper));
-        return List.of(new NameSpaceVo("application", list));
-
+        wrapper.eq(MoonConfigEntity::getNameSpaceId, nameSpaceId);
+        wrapper.orderByAsc(MoonConfigEntity::getId);
+        List<MoonConfigEntity> list = list(wrapper);
+        return Convert.toList(MoonConfigVo.class, list);
     }
 
-    public MoonConfigEntity getByKey(String appid, String key){
-        return lambdaQuery().eq(MoonConfigEntity::getAppid, appid).eq(MoonConfigEntity::getKey, key).one();
+    public MoonConfigEntity getByKey(Long nameSpaceId, String key){
+        return lambdaQuery().eq(MoonConfigEntity::getNameSpaceId, nameSpaceId).eq(MoonConfigEntity::getKey, key).one();
     }
 }
 

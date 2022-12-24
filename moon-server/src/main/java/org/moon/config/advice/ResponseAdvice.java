@@ -2,14 +2,13 @@ package org.moon.config.advice;
 
 import com.alibaba.fastjson.JSONObject;
 import org.jetbrains.annotations.NotNull;
-import org.moon.entity.vo.BaseVo;
+import org.moon.entity.base.BaseVo;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @ControllerAdvice(basePackages = "org.moon.controller")

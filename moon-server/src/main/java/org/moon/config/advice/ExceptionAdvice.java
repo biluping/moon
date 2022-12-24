@@ -1,7 +1,7 @@
 package org.moon.config.advice;
 
 import lombok.extern.slf4j.Slf4j;
-import org.moon.entity.vo.BaseVo;
+import org.moon.entity.base.BaseVo;
 import org.moon.exception.MoonBadRequestException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

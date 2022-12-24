@@ -9,7 +9,6 @@
             <result property="appid" column="appid" jdbcType="VARCHAR"/>
             <result property="key" column="key" jdbcType="VARCHAR"/>
             <result property="value" column="value" jdbcType="VARCHAR"/>
-            <result property="isMoonConfig" column="is_moon_config" jdbcType="SMALLINT"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
