@@ -16,6 +16,7 @@ public class MoonConfigFactory {
     private static final Map<String, String> moonConfigMap = new ConcurrentHashMap<>();
 
     public static final Map<String, MoonConfigBean> moonConfigBeanMap = new ConcurrentHashMap<>();
+    private static String url;
 
     public static void setConfig(String key, String value){
         moonConfigMap.put(key, value);
@@ -29,11 +30,27 @@ public class MoonConfigFactory {
         return moonConfigMap.get(key);
     }
 
+    public static String getConfig(String key, String defaultVal){
+        return moonConfigMap.getOrDefault(key, defaultVal);
+    }
+
+    public static Integer getConfigInt(String key, String defaultVal){
+        return Integer.parseInt(getConfig(key, defaultVal));
+    }
+
     public static Map<String, String> getConfig(){
         return moonConfigMap;
     }
 
     public static void addConfigBean(String key, Object bean, Field field){
         moonConfigBeanMap.put(key, new MoonConfigBean(bean, field));
+    }
+
+    public static void setUrl(String url) {
+        MoonConfigFactory.url = url;
+    }
+
+    public static String getUrl() {
+        return url;
     }
 }

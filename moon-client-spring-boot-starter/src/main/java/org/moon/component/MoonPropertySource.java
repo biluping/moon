@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.moon.entity.base.BaseVo;
+import org.moon.factory.MoonConfigFactory;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
@@ -26,6 +27,7 @@ public class MoonPropertySource extends MapPropertySource {
         String host = environment.getRequiredProperty("moon.host");
         String port = environment.getProperty("moon.port", "10305");
         String url = String.format("%s://%s:%s/config/moon/%s?isPublish=1", protocol, host, port, appid);
+        MoonConfigFactory.setUrl(url);
         log.info("配置中心地址:{}", url);
         String data = HttpUtil.get(url);
         BaseVo<Map<String, String>> vo = JSON.parseObject(data, new TypeReference<BaseVo<Map<String, String>>>(){});
