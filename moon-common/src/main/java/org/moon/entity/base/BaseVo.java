@@ -1,8 +1,10 @@
 package org.moon.entity.base;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class BaseVo<T> {
 
     private Integer code;

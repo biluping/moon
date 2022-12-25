@@ -29,4 +29,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>maven-nexus</id>
+            <name>maven-nexus</name>
+            <url>http://www.rabbit-cloud.top:8081/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>mvn-release</id>
+            <name>mvn-release</name>
+            <url>http://www.rabbit-cloud.top:8081/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
+
 </project>
