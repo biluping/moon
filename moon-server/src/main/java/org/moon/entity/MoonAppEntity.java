@@ -24,7 +24,7 @@ public class MoonAppEntity extends BaseEntity implements Serializable {
     /**
      * 应用url
      */
-    private String host;
+    private String describe;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

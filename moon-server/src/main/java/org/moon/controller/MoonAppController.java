@@ -1,11 +1,14 @@
 package org.moon.controller;
 
+import cn.hutool.core.convert.Convert;
 import lombok.AllArgsConstructor;
+import org.moon.entity.MoonAppEntity;
 import org.moon.entity.ao.MoonAppAo;
+import org.moon.entity.vo.MoonAppVo;
 import org.moon.service.MoonAppService;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -25,9 +28,9 @@ public class MoonAppController {
     }
 
     @GetMapping
-    public List<MoonAppAo> getApps(){
-        return moonAppService.list().stream().map(item -> new MoonAppAo(item.getAppid(), item.getHost()))
-                .collect(Collectors.toList());
+    public List<MoonAppVo> getApps(){
+        List<MoonAppEntity> list = moonAppService.lambdaQuery().orderByAsc(MoonAppEntity::getId).list();
+        return Convert.toList(MoonAppVo.class, list);
     }
 
 }

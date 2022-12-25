@@ -16,8 +16,8 @@ public class MoonAppAo {
     private String appid;
 
     /**
-     * 应用url
+     * 应用描述
      */
-    private String host;
+    private String describe;
 
 }
