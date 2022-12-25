@@ -1,10 +1,6 @@
 # moon
 参考携程 apollo 实现的一款前后端分离的配置中心
 
-### 编译命令
-jdk11 \
-mvnd clean package "-Dmaven.test.skip=true"
-
 ### 使用方法
 1、在 pom 中引入依赖
 ```xml
